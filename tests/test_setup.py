@@ -1,8 +1,8 @@
 def test_setup(machine, micropython):
-    import boilerplate
-    boilerplate.Boilerplate(machine.I2C())
+    import qwstpad
+    qwstpad.QwSTPad(machine.I2C())
 
 
 def test_version():
-    import boilerplate
-    assert boilerplate.__version__ == '0.0.1'
+    import qwstpad
+    assert qwstpad.__version__ == '0.0.1'

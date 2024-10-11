@@ -3,18 +3,18 @@ requires = ["hatchling", "hatch-fancy-pypi-readme"]
 build-backend = "hatchling.build"
 
 [project]
-name = "boilerplate-micropython"
+name = "qwstpad-micropython"
 dynamic = ["version", "readme"]
 authors = [
   { name="Phil", email="phil@pimoroni.com" },
 ]
-description = "boilerplate example for MicroPython libraries"
+description = "qwstpad example for MicroPython libraries"
 classifiers = [
     "License :: OSI Approved :: MIT License"
 ]
 
 [tool.hatch.version]
-path = "src/boilerplate/__init__.py"
+path = "src/qwstpad.py"
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
 content-type = "text/markdown"
@@ -26,7 +26,7 @@ fragments = [
 
 [tool.hatch.build]
 include = [
-    "src/boilerplate/__init__.py",
+    "src/qwstpad.py",
     "README.md",
     "CHANGELOG.md",
     "LICENSE.txt"
@@ -72,5 +72,5 @@ ignore = [
 ]
 
 [project.urls]
-GitHub = "https://www.github.com/pimoroni/boilerplate-micropython"
+GitHub = "https://www.github.com/pimoroni/qwstpad-micropython"
 Homepage = "https://www.pimoroni.com"

@@ -1,4 +1,4 @@
-# Boilerplate MicroPython
+# QwSTPad MicroPython
 
 This boilerplate repository is intended to be a starting point for library
 authors creating a `mip`-compatible library that is also available via
