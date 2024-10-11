@@ -67,7 +67,7 @@ class QwSTPad:
         self.__update_leds()
             
     def set_led(self, led, state):
-        if led < 1 or led > self.NUM_LEDS:
+        if led < 1 or led > NUM_LEDS:
             raise ValueError("'led' out of range. Expected 1 to 4")
 
         self.__led_states = self.__change_bit(self.__led_states, led - 1, state)
