@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling", "hatch-fancy-pypi-readme"]
+build-backend = "hatchling.build"
+
+[project]
+name = "boilerplate-micropython"
+dynamic = ["version", "readme"]
+authors = [
+  { name="Phil", email="phil@pimoroni.com" },
+]
+description = "boilerplate example for MicroPython libraries"
+classifiers = [
+    "License :: OSI Approved :: MIT License"
+]
+
+[tool.hatch.version]
+path = "src/boilerplate/__init__.py"
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/markdown"
+fragments = [
+  { path = "README.md" },
+  { text = "\n" },
+  { path = "CHANGELOG.md" }
+]
+
+[tool.hatch.build]
+include = [
+    "src/boilerplate/__init__.py",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE.txt"
+]
+
+[tool.hatch.build.targets.wheel]
+sources = ["src"]
+
+[tool.ruff]
+exclude = [
+    '.tox',
+    '.egg',
+    '.git',
+    '__pycache__',
+    'build',
+    'dist'
+]
+line-length = 200
+
+[tool.codespell]
+skip = """
+./.tox,\
+./.egg,\
+./.git,\
+./__pycache__,\
+./build,\
+./dist.\
+"""
+
+[tool.isort]
+line_length = 200
+
+[tool.check-manifest]
+ignore = [
+    'check.sh',
+    'Makefile',
+    'tox.ini',
+    'tests/*',
+    'examples/*',
+    'tools/*',
+    'requirements-dev.txt',
+    'package.json'
+]
+
+[project.urls]
+GitHub = "https://www.github.com/pimoroni/boilerplate-micropython"
+Homepage = "https://www.pimoroni.com"

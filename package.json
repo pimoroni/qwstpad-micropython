@@ -1,0 +1,9 @@
+{
+ "version": "0.0.1",
+ "urls": [
+  [
+   "boilerplate/__init__.py",
+   "github:pimoroni/boilerplate-micropython/src/boilerplate/__init__.py"
+  ]
+ ]
+}

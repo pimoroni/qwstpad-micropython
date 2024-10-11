@@ -1,0 +1,10 @@
+check-manifest
+ruff
+codespell
+isort
+twine
+build
+hatch
+hatch-fancy-pypi-readme
+tox
+pdoc
