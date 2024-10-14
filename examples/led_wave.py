@@ -1,7 +1,8 @@
 import time
-from machine import I2C
-from qwstpad import QwSTPad
 
+from machine import I2C
+
+from qwstpad import QwSTPad
 
 """
 """

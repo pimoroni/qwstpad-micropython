@@ -1,7 +1,9 @@
 import math
+
 from machine import I2C
-from qwstpad import QwSTPad, ADDRESSES
-from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565
+from picographics import DISPLAY_PICO_DISPLAY_2, PEN_RGB565, PicoGraphics
+
+from qwstpad import ADDRESSES, QwSTPad
 
 # Constants
 WHITE = const(65535)

@@ -1,15 +1,17 @@
 import time
+
 from machine import I2C
-from qwstpad import QwSTPad, DEFAULT_ADDRESS
-from picographics import PicoGraphics, DISPLAY_PICO_DISPLAY_2, PEN_RGB565
+from picographics import DISPLAY_PICO_DISPLAY_2, PEN_RGB565, PicoGraphics
+
+from qwstpad import DEFAULT_ADDRESS, QwSTPad
 
 # Constants
 WHITE = const(65535)
 BLACK = const(0)
 GREEN = const(57351)
 
-# Classes
 
+# Classes
 class Game(object):
     def __init__(self, i2c):
 
