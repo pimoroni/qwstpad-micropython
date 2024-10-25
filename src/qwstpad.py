@@ -34,7 +34,7 @@ class QwSTPad:
                                   })
     LED_MAPPING = (0x6, 0x7, 0x9, 0xA)
 
-    def __init__(self, i2c, address=DEFAULT_ADDRESS):
+    def __init__(self, i2c, address=DEFAULT_ADDRESS, show_address=True):
         if address not in ADDRESSES:
             raise ValueError("address is not valid. Expected: 0x21, 0x23, 0x25, or 0x27")
 
@@ -51,7 +51,11 @@ class QwSTPad:
             self.__button_states[key] = False
 
         self.__led_states = 0b0000
-        self.set_leds_from_addr()
+        if show_address:
+            self.set_leds(self.address_code())
+
+    def address_code(self):
+        return self.__change_bit(0x0000, ADDRESSES.index(self.__address), True)
 
     def read_buttons(self):
         state = self.__reg_read_uint16(self.__i2c, self.__address, self.INPUT_PORT0)
@@ -61,10 +65,6 @@ class QwSTPad:
 
     def set_leds(self, states):
         self.__led_states = states & 0b1111
-        self.__update_leds()
-
-    def set_leds_from_addr(self):
-        self.__led_states = self.__change_bit(0b0000, ADDRESSES.index(self.__address), True)
         self.__update_leds()
 
     def set_led(self, led, state):

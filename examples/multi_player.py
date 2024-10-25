@@ -1,11 +1,31 @@
 import math
+import sys
+from collections import namedtuple
 
 from machine import I2C
-from picographics import DISPLAY_PICO_DISPLAY_2, PEN_RGB565, PicoGraphics
+from picographics import DISPLAY_PICO_DISPLAY_2 as DISPLAY
+from picographics import PEN_RGB565, PicoGraphics
 
 from qwstpad import ADDRESSES, QwSTPad
 
-# Colour Constants
+"""
+A multi-player QwSTPad game demo. Each player drives a tank-like vehicle around an arena
+with the goal of hitting other players with projects to get the most points.
+Makes us of 1 to 4 QwSTPads and a Pico Display pack 2.0 / 2.8
+
+Controls:
+* U = Move Forward
+* D = Move Backward
+* R = Turn Right
+* L = Turn left
+* A = Fire
+"""
+
+# General Constants
+I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connected to
+BRIGHTNESS = 1.0                            # The brightness of the LCD backlight (from 0.0 to 1.0)
+
+# Colour Constants (RGB565)
 WHITE = const(65535)
 BLACK = const(0)
 CYAN = const(65287)
@@ -14,20 +34,30 @@ YELLOW = const(57599)
 GREEN = const(57351)
 RED = const(248)
 BLUE = const(7936)
+GREY = const(36467)
 
-# Projectile Constants
-PROJECTILE_LIMIT = 15
-PROJECTILE_SPEED = 5
-
-# Player Constants
-POSITIONS = ((30, 50), (280, 50), (30, 200), (280, 200))
-COLOURS = (GREEN, MAGENTA, CYAN, BLUE)
-LINE_LENGTH = 25
-START_ANGLE = 20
+# Gameplay Constants
+PlayerDef = namedtuple("PlayerDef", ("x", "y", "colour"))
+PLAYERS = (PlayerDef(x=30, y=50, colour=GREEN),
+           PlayerDef(x=280, y=50, colour=MAGENTA),
+           PlayerDef(x=30, y=200, colour=CYAN),
+           PlayerDef(x=280, y=200, colour=BLUE))
 PLAYER_RADIUS = 10
 PLAYER_SPEED = 4
-
+LINE_LENGTH = 25
+START_ANGLE = 20
+PROJECTILE_LIMIT = 15
+PROJECTILE_SPEED = 5
 GRID_SPACING = 20
+
+# Variables
+display = PicoGraphics(display=DISPLAY,         # The PicoGraphics instance used for drawing to the display
+                       pen_type=PEN_RGB565)     # It uses 16 bit (RGB565) colours
+i2c = I2C(**I2C_PINS)   # The I2C instance to pass to all QwSTPads
+players = []            # The list that will store the player objects
+
+# Get the width and height from the display
+WIDTH, HEIGHT = display.get_bounds()
 
 
 # Classes
@@ -91,12 +121,12 @@ class Player:
             self.x -= PLAYER_SPEED * math.cos(self.direction)
             self.y -= PLAYER_SPEED * math.sin(self.direction)
 
-        if button['A']:
-            self.fire()
-
         # Clamp the player to the screen area
         self.x = min(max(self.x, self.size), WIDTH - self.size)
         self.y = min(max(self.y, self.size), HEIGHT - self.size)
+
+        if button['A']:
+            self.fire()
 
         new_proj = []
         for projectile in self.projectiles:
@@ -129,21 +159,46 @@ class Player:
         display.set_pen(self.colour)
         display.text(f"P{self.index + 1}: {self.score}", 5 + self.index * 80, 227, WIDTH, 2)
 
+    def check_hits(self, players):
+        for other in players:
+            if other is not self:
+                for projectile in self.projectiles:
+                    if projectile.has_hit(other):
+                        other.was_hit = True
+                        self.score += 1
 
-class Game(object):
-    def __init__(self, i2c):
-        self.players = []
 
-        # Create a player for each QwSTPad detected
-        for i in range(len(ADDRESSES)):
-            try:
-                player = Player(i, *(POSITIONS[i]), PLAYER_RADIUS, COLOURS[i], QwSTPad(i2c, ADDRESSES[i]))
-                self.players.append(player)
-                print(f"P{i + 1}: Connected")
-            except OSError:
-                print(f"P{i + 1}: Not Connected")
+# Create a player for each connected QwSTPad
+for i in range(len(ADDRESSES)):
+    try:
+        p = PLAYERS[i]
+        pad = QwSTPad(i2c, ADDRESSES[i])
+        players.append(Player(i, p.x, p.y, PLAYER_RADIUS, p.colour, pad))
+        print(f"P{i + 1}: Connected")
+    except OSError:
+        print(f"P{i + 1}: Not Connected")
 
-    def draw(self, display):
+if len(players) == 0:
+    print("No QwSTPads connected ... Exiting")
+    sys.exit()
+
+print("QwSTPads connected ... Starting")
+
+# Turn on the display
+display.set_backlight(BRIGHTNESS)
+
+# Wrap the code in a try block, to catch any exceptions (including KeyboardInterrupt)
+try:
+    # Loop forever
+    while True:
+        # Update all players (and their projectiles)
+        for p in players:
+            p.update()
+
+        # Check if any projectiles have hit players
+        for p in players:
+            p.check_hits(players)
+
         # Clear the screen
         display.set_pen(BLACK)
         display.clear()
@@ -155,37 +210,15 @@ class Game(object):
                 display.pixel(x, y)
 
         # Draw players
-        for p in self.players:
+        for p in players:
             p.draw(display)
 
         # Update the screen
         display.update()
 
-    def update(self):
-        # Update all players and projectiles to their new positions
-        for p in self.players:
-            p.update()
-
-        # Check if any projectiles have hit players
-        for p1 in self.players:
-            for p2 in self.players:
-                if p2 is not p1:
-                    for projectile in p1.projectiles:
-                        if projectile.has_hit(p2):
-                            p2.was_hit = True
-                            p1.score += 1
-
-
-# Variables
-display = PicoGraphics(display=DISPLAY_PICO_DISPLAY_2, pen_type=PEN_RGB565)
-display.set_backlight(1.0)
-
-WIDTH, HEIGHT = display.get_bounds()
-GREY = display.create_pen(115, 115, 115)
-
-i2c = I2C(0, scl=5, sda=4)
-g = Game(i2c)
-
-while True:
-    g.update()
-    g.draw(display)
+finally:
+    # Turn off the backlight, clear the screen, and update
+    display.set_backlight(0)
+    display.set_pen(BLACK)
+    display.clear()
+    display.update()

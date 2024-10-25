@@ -1,23 +1,32 @@
+import sys
 import time
 
 from machine import I2C
 
-from qwstpad import QwSTPad
+from qwstpad import ADDRESSES, NUM_LEDS, QwSTPad
 
 """
+Apply a wave effect across QwSTPad's onboard LEDs.
 """
 
 # Constants
-SLEEP = 0.2     # The time between each LED update
+I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connected to
+I2C_ADDRESS = ADDRESSES[0]                  # The I2C address of the connected QwSTPad
+SLEEP = 0.2                                 # The time between each LED update
 
 # Variables
-current = 1     # The LED currently being controlled
-active = True   # The state to set the controlled LED to
+led = 1                                     # The LED currently being controlled
+active = True                               # The state to set the controlled LED to
 
-# Create the I2C instance and pass that to the QwSTPad
-i2c = I2C(0, scl=13, sda=12)
-qwstpad = QwSTPad(i2c)
 
+# Attempt to create the I2C instance and pass that to the QwSTPad
+try:
+    qwstpad = QwSTPad(I2C(**I2C_PINS), I2C_ADDRESS)
+except OSError:
+    print("QwSTPad: Not Connected ... Exiting")
+    sys.exit()
+
+print("QwSTPad: Connected ... Starting")
 
 # Wrap the code in a try block, to catch any exceptions (including KeyboardInterrupt)
 try:
@@ -26,12 +35,12 @@ try:
     # Loop forever
     while True:
         # Modify the current LED
-        qwstpad.set_led(current, active)
+        qwstpad.set_led(led, active)
 
         # Move along to the next LED, wrapping if reaching the end
-        current += 1
-        if current > 4:
-            current = 1
+        led += 1
+        if led > NUM_LEDS:
+            led = 1
             active = not active
 
         time.sleep(SLEEP)
