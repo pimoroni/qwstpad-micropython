@@ -1,5 +1,4 @@
 import math
-import sys
 from collections import namedtuple
 
 from machine import I2C
@@ -49,12 +48,15 @@ START_ANGLE = 20
 PROJECTILE_LIMIT = 15
 PROJECTILE_SPEED = 5
 GRID_SPACING = 20
+SCORE_TARGET = 1000
+TEXT_SHADOW = 2
 
 # Variables
 display = PicoGraphics(display=DISPLAY,         # The PicoGraphics instance used for drawing to the display
                        pen_type=PEN_RGB565)     # It uses 16 bit (RGB565) colours
-i2c = I2C(**I2C_PINS)   # The I2C instance to pass to all QwSTPads
-players = []            # The list that will store the player objects
+i2c = I2C(**I2C_PINS)                           # The I2C instance to pass to all QwSTPads
+players = []                                    # The list that will store the player objects
+complete = False                                # Has the game been completed?
 
 # Get the width and height from the display
 WIDTH, HEIGHT = display.get_bounds()
@@ -180,7 +182,7 @@ for i in range(len(ADDRESSES)):
 
 if len(players) == 0:
     print("No QwSTPads connected ... Exiting")
-    sys.exit()
+    raise SystemExit
 
 print("QwSTPads connected ... Starting")
 
@@ -191,13 +193,23 @@ display.set_backlight(BRIGHTNESS)
 try:
     # Loop forever
     while True:
-        # Update all players (and their projectiles)
-        for p in players:
-            p.update()
+        if not complete:
+            # Update all players (and their projectiles)
+            for p in players:
+                try:
+                    p.update()
+                # Handle QwSTPads being disconnected unexpectedly
+                except OSError:
+                    print(f"P{p.index + 1}: Diconnected ... Exiting")
+                    raise SystemExit
 
-        # Check if any projectiles have hit players
-        for p in players:
-            p.check_hits(players)
+            # Check if any projectiles have hit players
+            for p in players:
+                p.check_hits(players)
+
+                # Check if any player has reached the score target
+                if p.score >= SCORE_TARGET:
+                    complete = True
 
         # Clear the screen
         display.set_pen(BLACK)
@@ -213,11 +225,28 @@ try:
         for p in players:
             p.draw(display)
 
+        if complete:
+            # Draw banner shadow
+            display.set_pen(BLACK)
+            display.rectangle(4, 94, WIDTH, 50)
+
+            # Draw banner
+            display.set_pen(GREEN)
+            display.rectangle(0, 90, WIDTH, 50)
+
+            # Draw text shadow
+            display.set_pen(BLACK)
+            display.text("Game Complete!", WIDTH // 6 + TEXT_SHADOW, 105 + TEXT_SHADOW, WIDTH, 3)
+
+            # Draw text
+            display.set_pen(WHITE)
+            display.text("Game Complete!", WIDTH // 6, 105, WIDTH, 3)
+
         # Update the screen
         display.update()
 
+# Turn off the backlight, clear the screen, and update
 finally:
-    # Turn off the backlight, clear the screen, and update
     display.set_backlight(0)
     display.set_pen(BLACK)
     display.clear()

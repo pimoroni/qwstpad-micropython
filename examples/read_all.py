@@ -1,4 +1,3 @@
-import sys
 import time
 
 from machine import I2C
@@ -20,7 +19,7 @@ try:
     qwstpad = QwSTPad(I2C(**I2C_PINS), I2C_ADDRESS)
 except OSError:
     print("QwSTPad: Not Connected ... Exiting")
-    sys.exit()
+    raise SystemExit
 
 print("QwSTPad: Connected ... Starting")
 
@@ -36,5 +35,12 @@ try:
 
         time.sleep(SLEEP)
 
+# Handle the QwSTPad being disconnected unexpectedly
+except OSError:
+    print("QwSTPad: Disconnected .. Exiting")
+    qwstpad = None
+
+# Turn off all four LEDs if there is still a QwSTPad
 finally:
-    qwstpad.clear_leds()    # Turn off all four LEDs
+    if qwstpad is not None:
+        qwstpad.clear_leds()
