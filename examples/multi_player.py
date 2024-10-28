@@ -77,7 +77,7 @@ class Projectile:
         display.pixel(int(self.x), int(self.y))
 
     def is_on_screen(self):
-        return self.x >= 0 and self.x < WIDTH and  self.y >= 0 and self.y < HEIGHT
+        return self.x >= 0 and self.x < WIDTH and self.y >= 0 and self.y < HEIGHT
 
     def has_hit(self, player):
         xdiff = self.x - player.x
@@ -200,7 +200,7 @@ try:
                     p.update()
                 # Handle QwSTPads being disconnected unexpectedly
                 except OSError:
-                    print(f"P{p.index + 1}: Diconnected ... Exiting")
+                    print(f"P{p.index + 1}: Disconnected ... Exiting")
                     raise SystemExit
 
             # Check if any projectiles have hit players

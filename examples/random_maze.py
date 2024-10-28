@@ -1,6 +1,6 @@
 import gc
-import time
 import random
+import time
 from collections import namedtuple
 
 from machine import I2C
@@ -8,7 +8,6 @@ from picographics import DISPLAY_PICO_DISPLAY_2 as DISPLAY
 from picographics import PEN_RGB565, PicoGraphics
 
 from qwstpad import ADDRESSES, QwSTPad
-
 
 # General Constants
 I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connected to
@@ -81,7 +80,7 @@ class MazeBuilder:
             raise ValueError("width out of range. Expected greater than 0")
 
         if height <= 0:
-            raise ValueError(f"height out of range. Expected greater than 0")
+            raise ValueError("height out of range. Expected greater than 0")
 
         self.width = width
         self.height = height
@@ -148,7 +147,6 @@ class MazeBuilder:
 
         self.grid_columns = (self.width * 2 + 1)
         self.grid_rows = (self.height * 2 + 1)
-
 
     def choose_neighbour(self, current):
         unvisited = []
@@ -242,7 +240,6 @@ def build_maze():
     width = random.randrange(MIN_MAZE_WIDTH, MAX_MAZE_WIDTH)
     height = random.randrange(MIN_MAZE_HEIGHT, MAX_MAZE_HEIGHT)
     builder.build(width + difficulty, height + difficulty)
-
 
     wall_separation = min(HEIGHT // builder.grid_rows,
                           WIDTH // builder.grid_columns)
