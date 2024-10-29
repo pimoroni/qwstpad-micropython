@@ -5,9 +5,22 @@ from collections import namedtuple
 
 from machine import I2C
 from picographics import DISPLAY_PICO_DISPLAY_2 as DISPLAY
-from picographics import PEN_RGB565, PicoGraphics
+from picographics import PEN_RGB565, RGB_to_RGB565, PicoGraphics
 
 from qwstpad import ADDRESSES, QwSTPad
+
+"""
+A single player QwSTPad game demo. Navigate a set of mazes from the start (red) to the goal (green).
+Mazes get bigger / harder with each increase in level.
+Makes us of 1 QwSTPad and a Pico Display pack 2.0 / 2.8
+
+Controls:
+* U = Move Forward
+* D = Move Backward
+* R = Move Right
+* L = Move left
+* + = Continue (once the current level is complete)
+"""
 
 # General Constants
 I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connected to
@@ -15,13 +28,14 @@ I2C_ADDRESS = ADDRESSES[0]                  # The I2C address of the connected Q
 BRIGHTNESS = 1.0                            # The brightness of the LCD backlight (from 0.0 to 1.0)
 
 # Colour Constants (RGB565)
-WHITE = const(65535)
-BLACK = const(0)
-RED = const(248)
-GREEN = const(57351)
-PLAYER = const(11751)
-WALL = const(65147)
-PATH = const(54585)
+WHITE = RGB_to_RGB565(255, 255, 255)
+BLACK = RGB_to_RGB565(0, 0, 0)
+RED = RGB_to_RGB565(255, 0, 0)
+GREEN = RGB_to_RGB565(0, 255, 0)
+PLAYER = RGB_to_RGB565(227, 231, 110)
+WALL = RGB_to_RGB565(127, 125, 244)
+BACKGROUND = RGB_to_RGB565(60, 57, 169)
+PATH = RGB_to_RGB565((227 + 60) // 2, (231 + 57) // 2, (110 + 169) // 2)
 
 # Gameplay Constants
 Position = namedtuple("Position", ("x", "y"))
@@ -176,17 +190,20 @@ class MazeBuilder:
         # Draw the maze we have built. Each '1' in the array represents a wall
         for row in range(self.grid_rows):
             for col in range(self.grid_columns):
-                if self.maze[row][col]:
-                    # Calculate the screen coordinates
-                    x = (col * wall_separation) + offset_x
-                    y = (row * wall_separation) + offset_y
+                # Calculate the screen coordinates
+                x = (col * wall_separation) + offset_x
+                y = (row * wall_separation) + offset_y
 
+                if self.maze[row][col] == 1:
                     # Draw a wall shadow
                     display.set_pen(BLACK)
                     display.rectangle(x + WALL_SHADOW, y + WALL_SHADOW, wall_size, wall_size)
 
                     # Draw a wall top
                     display.set_pen(WALL)
+                    display.rectangle(x, y, wall_size, wall_size)
+                if self.maze[row][col] == 2:
+                    display.set_pen(PATH)
                     display.rectangle(x, y, wall_size, wall_size)
 
 
@@ -205,21 +222,23 @@ class Player(object):
         # Read the player's gamepad
         button = self.pad.read_buttons()
 
-        if button['L'] and maze[self.y][self.x - 1] == 0:
+        if button['L'] and maze[self.y][self.x - 1] != 1:
             self.x -= 1
             time.sleep(MOVEMENT_SLEEP)
 
-        if button['R'] and maze[self.y][self.x + 1] == 0:
+        elif button['R'] and maze[self.y][self.x + 1] != 1:
             self.x += 1
             time.sleep(MOVEMENT_SLEEP)
 
-        if button['U'] and maze[self.y - 1][self.x] == 0:
+        elif button['U'] and maze[self.y - 1][self.x] != 1:
             self.y -= 1
             time.sleep(MOVEMENT_SLEEP)
 
-        if button['D'] and maze[self.y + 1][self.x] == 0:
+        elif button['D'] and maze[self.y + 1][self.x] != 1:
             self.y += 1
             time.sleep(MOVEMENT_SLEEP)
+
+        maze[self.y][self.x] = 2
 
     def draw(self, display):
         display.set_pen(self.colour)
@@ -287,8 +306,8 @@ try:
                 build_maze()
                 player.position(*start)
 
-        # Clear the screen to the path colour
-        display.set_pen(PATH)
+        # Clear the screen to the background colour
+        display.set_pen(BACKGROUND)
         display.clear()
 
         # Draw the maze walls
@@ -340,9 +359,9 @@ try:
 except OSError:
     print("QwSTPad: Disconnected .. Exiting")
 
-# Turn off the backlight, clear the screen, and update
+# Turn off the LEDs of the connected QwSTPad
 finally:
-    display.set_backlight(0)
-    display.set_pen(BLACK)
-    display.clear()
-    display.update()
+    try:
+        player.pad.clear_leds()
+    except OSError:
+        pass

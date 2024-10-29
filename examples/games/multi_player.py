@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from machine import I2C
 from picographics import DISPLAY_PICO_DISPLAY_2 as DISPLAY
-from picographics import PEN_RGB565, PicoGraphics
+from picographics import PEN_RGB565, RGB_to_RGB565, PicoGraphics
 
 from qwstpad import ADDRESSES, QwSTPad
 
@@ -25,15 +25,15 @@ I2C_PINS = {"id": 0, "sda": 4, "scl": 5}    # The I2C pins the QwSTPad is connec
 BRIGHTNESS = 1.0                            # The brightness of the LCD backlight (from 0.0 to 1.0)
 
 # Colour Constants (RGB565)
-WHITE = const(65535)
-BLACK = const(0)
-CYAN = const(65287)
-MAGENTA = const(8184)
-YELLOW = const(57599)
-GREEN = const(57351)
-RED = const(248)
-BLUE = const(7936)
-GREY = const(36467)
+WHITE = RGB_to_RGB565(255, 255, 255)
+BLACK = RGB_to_RGB565(0, 0, 0)
+CYAN = RGB_to_RGB565(0, 255, 255)
+MAGENTA = RGB_to_RGB565(255, 0, 255)
+YELLOW = RGB_to_RGB565(255, 255, 0)
+GREEN = RGB_to_RGB565(0, 255, 0)
+RED = RGB_to_RGB565(255, 0, 0)
+BLUE = RGB_to_RGB565(0, 0, 255)
+GREY = RGB_to_RGB565(115, 115, 115)
 
 # Gameplay Constants
 PlayerDef = namedtuple("PlayerDef", ("x", "y", "colour"))
@@ -245,9 +245,10 @@ try:
         # Update the screen
         display.update()
 
-# Turn off the backlight, clear the screen, and update
+# Turn off the LEDs of any connected QwSTPads
 finally:
-    display.set_backlight(0)
-    display.set_pen(BLACK)
-    display.clear()
-    display.update()
+    for p in players:
+        try:
+            p.pad.clear_leds()
+        except OSError:
+            pass
