@@ -66,6 +66,8 @@ ignore = [
     'tox.ini',
     'tests/*',
     'examples/*',
+    'examples/function/*',
+    'examples/games/*',
     'tools/*',
     'requirements-dev.txt',
     'package.json'

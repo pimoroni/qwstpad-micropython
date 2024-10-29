@@ -5,7 +5,7 @@ from collections import namedtuple
 
 from machine import I2C
 from picographics import DISPLAY_PICO_DISPLAY_2 as DISPLAY
-from picographics import PEN_RGB565, RGB_to_RGB565, PicoGraphics
+from picographics import PEN_RGB565, PicoGraphics, RGB_to_RGB565
 
 from qwstpad import ADDRESSES, QwSTPad
 
@@ -202,7 +202,9 @@ class MazeBuilder:
                     # Draw a wall top
                     display.set_pen(WALL)
                     display.rectangle(x, y, wall_size, wall_size)
+
                 if self.maze[row][col] == 2:
+                    # Draw the player path
                     display.set_pen(PATH)
                     display.rectangle(x, y, wall_size, wall_size)
 

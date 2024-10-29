@@ -3,7 +3,7 @@ from collections import namedtuple
 
 from machine import I2C
 from picographics import DISPLAY_PICO_DISPLAY_2 as DISPLAY
-from picographics import PEN_RGB565, RGB_to_RGB565, PicoGraphics
+from picographics import PEN_RGB565, PicoGraphics, RGB_to_RGB565
 
 from qwstpad import ADDRESSES, QwSTPad
 
