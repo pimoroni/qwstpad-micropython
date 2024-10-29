@@ -12,7 +12,7 @@ from qwstpad import ADDRESSES, QwSTPad
 """
 A single player QwSTPad game demo. Navigate a set of mazes from the start (red) to the goal (green).
 Mazes get bigger / harder with each increase in level.
-Makes us of 1 QwSTPad and a Pico Display pack 2.0 / 2.8
+Makes use of 1 QwSTPad and a Pico Display Pack 2.0 / 2.8.
 
 Controls:
 * U = Move Forward

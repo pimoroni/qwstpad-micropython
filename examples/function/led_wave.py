@@ -5,7 +5,7 @@ from machine import I2C
 from qwstpad import ADDRESSES, NUM_LEDS, QwSTPad
 
 """
-Apply a wave effect across QwSTPad's onboard LEDs
+Apply a wave effect across QwSTPad's onboard LEDs.
 """
 
 # Constants

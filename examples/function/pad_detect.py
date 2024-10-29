@@ -5,7 +5,7 @@ from machine import I2C
 from qwstpad import ADDRESSES, QwSTPad
 
 """
-How to detect multiple QwSTPads and handle their unexpected connection and disconnection
+How to detect multiple QwSTPads and handle their unexpected connection and disconnection.
 """
 
 # Constants

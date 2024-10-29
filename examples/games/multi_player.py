@@ -10,7 +10,7 @@ from qwstpad import ADDRESSES, QwSTPad
 """
 A multi-player QwSTPad game demo. Each player drives a tank-like vehicle around an arena
 with the goal of hitting other players with projects to get the most points.
-Makes us of 1 to 4 QwSTPads and a Pico Display pack 2.0 / 2.8
+Makes use of 1 to 4 QwSTPads and a Pico Display Pack 2.0 / 2.8.
 
 Controls:
 * U = Move Forward

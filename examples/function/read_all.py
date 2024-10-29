@@ -5,7 +5,7 @@ from machine import I2C
 from qwstpad import ADDRESSES, QwSTPad
 
 """
-How to read all of the buttons on QwSTPad
+How to read all of the buttons on QwSTPad.
 """
 
 # Constants
