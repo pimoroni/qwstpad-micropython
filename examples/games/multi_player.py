@@ -138,6 +138,10 @@ class Player:
 
         self.projectiles = new_proj
 
+    def hit(self):
+        self.was_hit = True
+        self.pad.set_leds(0b1111)
+
     def draw(self, display):
         x, y = int(self.x), int(self.y)
         display.set_pen(WHITE)
@@ -145,6 +149,7 @@ class Player:
         display.set_pen(BLACK) if not self.was_hit else display.set_pen(RED)
         display.circle(x, y, self.size - 1)
         self.was_hit = False
+        self.pad.set_leds(self.pad.address_code())
 
         # Draw the direction line in our colour
         display.set_pen(self.colour)
@@ -166,7 +171,7 @@ class Player:
             if other is not self:
                 for projectile in self.projectiles:
                     if projectile.has_hit(other):
-                        other.was_hit = True
+                        other.hit()
                         self.score += 1
 
 
