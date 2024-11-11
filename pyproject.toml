@@ -6,7 +6,10 @@ build-backend = "hatchling.build"
 name = "qwstpad-micropython"
 dynamic = ["version", "readme"]
 authors = [
-  { name="Phil", email="phil@pimoroni.com" },
+    { name = "Chris P", email = "chris@pimoroni.com" },
+]
+maintainers = [
+    { name = "Chris P", email = "chris@pimoroni.com" },
 ]
 description = "qwstpad example for MicroPython libraries"
 classifiers = [
