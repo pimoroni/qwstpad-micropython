@@ -1,6 +1,6 @@
 # QwSTPad MicroPython
 
-The [Pimoroni QwSTPad](https://shop.pimoroni.com/products/qwstpad) is an I2C mini gamepad with 10 buttons and 4 status LEDs. The buttons are arranged as two four-way directional pads with two independent buttons in the middle.
+The [Pimoroni QwSTPad](https://pimoroni.com/qwstpad) is an I2C mini gamepad with 10 buttons and 4 status LEDs. The buttons are arranged as two four-way directional pads with two independent buttons in the middle.
 
 
 ## Getting Started
